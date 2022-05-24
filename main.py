@@ -1,6 +1,5 @@
 import asyncio
 from pyrogram import Client
-from pyrogram.errors import FloodWait
 from aiogram import Bot, Dispatcher, executor, types
 from random import randint
 from config import api_id, api_hash, api_token, buffer_chat_id, stock_chat_id, update_time
