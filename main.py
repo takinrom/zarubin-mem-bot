@@ -1,20 +1,28 @@
 import asyncio
 from pyrogram import Client
+from pyrogram.errors import FloodWait
 from aiogram import Bot, Dispatcher, executor, types
 from random import randint
-from config import api_id, api_hash, api_token, buffer_chat_id, stock_chat_id
+from config import api_id, api_hash, api_token, buffer_chat_id, stock_chat_id, update_time
+from time import time
 
-
+stock = []
+last_update = int(time())
 bot = Bot(token=api_token)
 dp = Dispatcher(bot)
+app = Client("my_account", no_updates=True)
 
 
 async def get_random_photo_from_stock(chat_id):
-    async with Client("my_account", api_id, api_hash) as app:
-        stock = []
-        async for message in app.get_chat_history(stock_chat_id):
-            if message.photo != None:
-                stock.append(message)
+    global stock, last_update
+    if(int(time()) - last_update > update_time or stock == []):
+        async with app:
+            last_update = time()
+            stock = []
+            async for message in app.get_chat_history(stock_chat_id):
+                if message.photo != None:
+                    stock.append(message)
+    async with app:
         rand = randint(0, len(stock) - 1)
         await app.send_photo(buffer_chat_id, stock[rand].photo.file_id, str(chat_id))
 
